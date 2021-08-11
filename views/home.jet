@@ -10,6 +10,13 @@
 			integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
 			crossorigin="anonymous"
 		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/notie/4.3.1/notie.min.css"
+			integrity="sha512-UrjLcAek5jbj1vwGbXkviPHtgSNVNQCedX7cBIMDdSI2iZtUcZcoTh2Sqc8R9mVcijOjFUi1IlxhfrE1uWaIog=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
 		<title>Go Chat v2</title>
 		<style>
 			.chatbox {
@@ -69,6 +76,12 @@
 		integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
 		crossorigin="anonymous"
 	></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/notie/4.3.1/notie.min.js"
+		integrity="sha512-NHRCwRf2LnVSlLDejCA9oS3fG3/FLSQIPCjAWl3M7tVi5wszwr6FxkjotWnQDXLE+aLKcxRrzFDNEgXj9nvkPw=="
+		crossorigin="anonymous"
+		referrerpolicy="no-referrer"
+	></script>
 	<script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket-cjs.min.js"></script>
 	<script>
 		let socket = null
@@ -81,7 +94,7 @@
 			socket = new ReconnectingWebSocket('ws://localhost:8080/ws')
 
 			socket.onopen = () => {
-				console.log('Connection Success!')
+				toast('success', 'Connected!')
 				const payload = {
 					action: 'change_username',
 					username: username.value.trim(),
@@ -90,11 +103,11 @@
 			}
 
 			socket.onclose = () => {
-				console.log('Disconnected from WebSocket!')
+				toast('error', 'Disconnected!')
 			}
 
-			socket.onerror = (err) => {
-				console.log('A WebSocket error occurred!', err)
+			socket.onerror = () => {
+				toast('warning', 'Reconnecting!')
 			}
 
 			socket.onmessage = (msg) => {
@@ -130,11 +143,11 @@
 		let currentUsername = ''
 		username.onblur = () => {
 			if (currentUsername == username.value.trim()) {
-				// toast('username not changed')
+				toast('warning', 'Username not changed')
 				return
 			}
 			if (username.value.trim().length > 12) {
-				// toast('username trimmed to 12 chars')
+				toast('warning', 'Username trimmed to 12 chars')
 				username.value = username.value.trim().substring(0, 13)
 			}
 			const payload = {
@@ -161,6 +174,13 @@
 			}
 			socket.send(JSON.stringify(payload))
 			message.value = ''
+		}
+
+		function toast(type, msg) {
+			notie.alert({
+				type: type, // optional, default = 4, enum: [1, 2, 3, 4, 5, 'success', 'warning', 'error', 'info', 'neutral']
+				text: msg,
+			})
 		}
 	</script>
 </html>
