@@ -13,6 +13,7 @@ var mux *pat.PatternServeMux
 func init() {
 	mux = pat.New()
 	mux.Get("/", http.HandlerFunc(handlers.Home))
+	mux.Get("/ws", http.HandlerFunc(handlers.Websocket))
 
 	// Register this pat with the default serve mux
 	// so that other packages may also be exported.

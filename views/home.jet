@@ -9,4 +9,28 @@
 	<body>
 		<h1>Home page</h1>
 	</body>
+
+	<script>
+		let socket = null
+
+		document.addEventListener('DOMContentLoaded', (ev) => {
+			socket = new WebSocket('ws://localhost:8080/ws')
+
+			socket.onopen = () => {
+				console.log('Connection Success!')
+			}
+
+			socket.onclose = () => {
+				console.log('Disconnected from WebSocket!')
+			}
+
+			socket.onerror = (err) => {
+				console.log('A WebSocket error occurred!', err)
+			}
+
+			socket.onmessage = (msg) => {
+				console.log(msg)
+			}
+		})
+	</script>
 </html>
