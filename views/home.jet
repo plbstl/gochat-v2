@@ -69,6 +69,7 @@
 		integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
 		crossorigin="anonymous"
 	></script>
+	<script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket-cjs.min.js"></script>
 	<script>
 		let socket = null
 
@@ -77,13 +78,13 @@
 		}
 
 		document.addEventListener('DOMContentLoaded', (ev) => {
-			socket = new WebSocket('ws://localhost:8080/ws')
+			socket = new ReconnectingWebSocket('ws://localhost:8080/ws')
 
 			socket.onopen = () => {
 				console.log('Connection Success!')
 				const payload = {
 					action: 'change_username',
-					username: 'anonymous',
+					username: username.value,
 				}
 				socket.send(JSON.stringify(payload))
 			}
