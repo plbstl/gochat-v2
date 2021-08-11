@@ -64,8 +64,9 @@
 				</div>
 
 				<div class="col-md-4">
-					<h3>Activity</h3>
-					<ul id="activity"></ul>
+					<span class="float-end badge mt-1" id="status">idle</span>
+					<h3>Users</h3>
+					<ul id="users"></ul>
 				</div>
 			</div>
 		</div>
@@ -92,9 +93,25 @@
 
 		document.addEventListener('DOMContentLoaded', (ev) => {
 			socket = new ReconnectingWebSocket('ws://localhost:8080/ws')
+			const online = document.createTextNode('online')
+			const offline = document.createTextNode('offline')
+
+			function changeStatus(isOnline) {
+				const status = document.getElementById('status')
+				if (isOnline) {
+					status.replaceChild(online, status.firstChild)
+					status.classList.remove('bg-danger')
+					status.classList.add('bg-success')
+				} else {
+					status.replaceChild(offline, status.firstChild)
+					status.classList.remove('bg-success')
+					status.classList.add('bg-danger')
+				}
+			}
 
 			socket.onopen = () => {
 				toast('success', 'Connected!')
+				changeStatus(true)
 				const payload = {
 					action: 'change_username',
 					username: username.value.trim(),
@@ -103,10 +120,12 @@
 			}
 
 			socket.onclose = () => {
+				changeStatus(false)
 				toast('error', 'Disconnected!')
 			}
 
 			socket.onerror = () => {
+				changeStatus(false)
 				toast('warning', 'Reconnecting!')
 			}
 
@@ -115,7 +134,7 @@
 
 				switch (data.action) {
 					case 'list_users':
-						const ul = document.getElementById('activity')
+						const ul = document.getElementById('users')
 						while (ul.firstChild) ul.removeChild(ul.firstChild)
 
 						data.connectedUsers.forEach((username) => {
@@ -147,7 +166,7 @@
 				return
 			}
 			if (username.value.trim().length > 12) {
-				toast('warning', 'Username trimmed to 12 chars')
+				toast('warning', 'Username trimmed to 12 characters')
 				username.value = username.value.trim().substring(0, 13)
 			}
 			const payload = {
