@@ -48,6 +48,9 @@
 							class="form-control"
 							autocomplete="off"
 						/>
+						<button class="btn btn-outline-secondary mt-3">
+							Send Message
+						</button>
 					</form>
 					<hr />
 					<div id="output" class="chatbox mb-5"></div>
@@ -140,14 +143,17 @@
 			currentUsername = username.value
 		}
 
-		const message = document.getElementById('message')
-		message.onchange = (ev) => {
+		const form = document.querySelector('form')
+		form.onsubmit = (ev) => {
+			ev.preventDefault()
+			ev.stopPropagation()
+			const message = document.getElementById('message')
 			const payload = {
 				action: 'send_message',
-				message: ev.target.value,
+				message: message.value,
 			}
 			socket.send(JSON.stringify(payload))
-			ev.target.value = ''
+			message.value = ''
 		}
 	</script>
 </html>
