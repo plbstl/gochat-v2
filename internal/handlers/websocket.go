@@ -70,7 +70,6 @@ func listenForWsConn(conn *wsConn) {
 // ListenOnWsChan indefintely listens for new payload on
 // WsChan and processes it according to payload.Action.
 func ListenOnWsChan() {
-	var response WsResponse
 	for {
 		p := <-WsChan
 		switch p.Action {
@@ -82,8 +81,10 @@ func ListenOnWsChan() {
 			clients[p.Conn] = p.Username
 			log.Println("Size of Connection Pool:", len(clients))
 			mu.Unlock()
-			response.Action = "list_users"
-			response.ConnectedUsers = users()
+			response := WsResponse{
+				Action:         "list_users",
+				ConnectedUsers: users(),
+			}
 			broadcast(response)
 
 		case "disconnect_client":
@@ -91,18 +92,24 @@ func ListenOnWsChan() {
 			delete(clients, p.Conn)
 			log.Println("Size of Connection Pool:", len(clients))
 			mu.Unlock()
-			response.Action = "list_users"
-			response.ConnectedUsers = users()
+			response := WsResponse{
+				Action:         "list_users",
+				ConnectedUsers: users(),
+			}
 			broadcast(response)
 
 		case "send_message":
-			response.Action = "receive_message"
-			response.Message = p.Message
-			response.MessageType = clients[p.Conn]
+			response := WsResponse{
+				Action:      "receive_message",
+				Message:     p.Message,
+				MessageType: clients[p.Conn],
+			}
 			broadcast(response)
 
 		default:
-			response.Action = "unsupported"
+			response := WsResponse{
+				Action: "unsupported",
+			}
 			p.Conn.WriteJSON(response)
 		}
 	}
