@@ -84,7 +84,7 @@
 				console.log('Connection Success!')
 				const payload = {
 					action: 'change_username',
-					username: username.value,
+					username: username.value.trim(),
 				}
 				socket.send(JSON.stringify(payload))
 			}
@@ -129,19 +129,22 @@
 		const username = document.getElementById('username')
 		let currentUsername = ''
 		username.onblur = () => {
-			if (currentUsername == username.value) {
-				// toast('username is not changed')
+			if (currentUsername == username.value.trim()) {
+				// toast('username not changed')
 				return
+			}
+			if (username.value.trim().length > 12) {
+				// toast('username trimmed to 12 chars')
+				username.value = username.value.trim().substring(0, 13)
 			}
 			const payload = {
 				action: 'change_username',
-				// @todo: validate username.
 				username: username.value,
 			}
 			socket.send(JSON.stringify(payload))
 		}
 		username.onfocus = () => {
-			currentUsername = username.value
+			currentUsername = username.value.trim()
 		}
 
 		const form = document.querySelector('form')
@@ -149,9 +152,12 @@
 			ev.preventDefault()
 			ev.stopPropagation()
 			const message = document.getElementById('message')
+			if (message.value.trim() == '') {
+				return
+			}
 			const payload = {
 				action: 'send_message',
-				message: message.value,
+				message: message.value.trim(),
 			}
 			socket.send(JSON.stringify(payload))
 			message.value = ''
