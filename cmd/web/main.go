@@ -13,6 +13,7 @@ var mux *pat.PatternServeMux
 func init() {
 	mux = pat.New()
 	mux.Get("/", http.HandlerFunc(handlers.Home))
+	mux.Get("/favicon.ico", http.HandlerFunc(handlers.Favicon))
 	mux.Get("/ws", http.HandlerFunc(handlers.Websocket))
 
 	// Register this pat with the default serve mux
