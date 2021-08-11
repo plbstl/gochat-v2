@@ -75,6 +75,9 @@ func ListenOnWsChan() {
 		p := <-WsChan
 		switch p.Action {
 		case "change_username":
+			if p.Username == "" {
+				p.Username = "anonymous"
+			}
 			mu.Lock()
 			clients[p.Conn] = p.Username
 			log.Println("Size of Connection Pool:", len(clients))
@@ -95,7 +98,7 @@ func ListenOnWsChan() {
 		case "send_message":
 			response.Action = "receive_message"
 			response.Message = p.Message
-			response.MessageType = p.Username
+			response.MessageType = clients[p.Conn]
 			broadcast(response)
 
 		default:
