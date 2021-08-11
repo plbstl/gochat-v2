@@ -11,7 +11,6 @@
 			crossorigin="anonymous"
 		/>
 		<title>Go Chat v2</title>
-
 		<style>
 			.chatbox {
 				min-height: 180px;
@@ -56,6 +55,7 @@
 
 				<div class="col-md-4">
 					<h3>Activity</h3>
+					<ul id="activity"></ul>
 				</div>
 			</div>
 		</div>
@@ -69,11 +69,20 @@
 	<script>
 		let socket = null
 
+		window.onbeforeunload = () => {
+			socket.send(JSON.stringify({ action: 'disconnect_client' }))
+		}
+
 		document.addEventListener('DOMContentLoaded', (ev) => {
 			socket = new WebSocket('ws://localhost:8080/ws')
 
 			socket.onopen = () => {
 				console.log('Connection Success!')
+				const payload = {
+					action: 'change_username',
+					username: 'anonymous',
+				}
+				socket.send(JSON.stringify(payload))
 			}
 
 			socket.onclose = () => {
@@ -85,8 +94,39 @@
 			}
 
 			socket.onmessage = (msg) => {
-				console.log(msg)
+				let data = JSON.parse(msg.data)
+
+				switch (data.action) {
+					case 'list_users':
+						const ul = document.getElementById('activity')
+						while (ul.firstChild) ul.removeChild(ul.firstChild)
+
+						data.connectedUsers.forEach((username) => {
+							const li = document.createElement('li')
+							li.appendChild(document.createTextNode(username))
+							ul.appendChild(li)
+						})
+						break
+				}
 			}
 		})
+
+		const username = document.getElementById('username')
+		let currentUsername = ''
+		username.onblur = () => {
+			if (currentUsername == username.value) {
+				// toast('username is not changed')
+				return
+			}
+			const payload = {
+				action: 'change_username',
+				// @todo: validate username.
+				username: username.value,
+			}
+			socket.send(JSON.stringify(payload))
+		}
+		username.onfocus = () => {
+			currentUsername = username.value
+		}
 	</script>
 </html>

@@ -22,9 +22,7 @@ func init() {
 }
 
 func main() {
+	go handlers.ListenOnWsChan()
 	log.Println("Go Chat v2 \t http://localhost:8080")
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		log.Fatalln("ListenAndServe:", err)
-	}
+	log.Fatalln(http.ListenAndServe(":8080", mux))
 }
