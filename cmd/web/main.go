@@ -15,6 +15,7 @@ func init() {
 	mux.Get("/", http.HandlerFunc(handlers.Home))
 	mux.Get("/favicon.ico", http.HandlerFunc(handlers.Favicon))
 	mux.Get("/ws", http.HandlerFunc(handlers.Websocket))
+	mux.Get("/static/", handlers.StaticFiles("./static/"))
 
 	// Register this pat with the default serve mux
 	// so that other packages may also be exported.
