@@ -50,7 +50,7 @@
 						/>
 					</form>
 					<hr />
-					<div id="output" class="chatbox"></div>
+					<div id="output" class="chatbox mb-5"></div>
 				</div>
 
 				<div class="col-md-4">
@@ -107,6 +107,17 @@
 							ul.appendChild(li)
 						})
 						break
+
+					case 'receive_message':
+						const output = document.getElementById('output')
+						const p = document.createElement('p')
+						const b = document.createElement('b')
+						b.textContent = `${data.messageType}: `
+						p.appendChild(b)
+						p.appendChild(document.createTextNode(data.message))
+						p.style.marginBottom = 0
+						output.appendChild(p)
+						break
 				}
 			}
 		})
@@ -127,6 +138,16 @@
 		}
 		username.onfocus = () => {
 			currentUsername = username.value
+		}
+
+		const message = document.getElementById('message')
+		message.onchange = (ev) => {
+			const payload = {
+				action: 'send_message',
+				message: ev.target.value,
+			}
+			socket.send(JSON.stringify(payload))
+			ev.target.value = ''
 		}
 	</script>
 </html>

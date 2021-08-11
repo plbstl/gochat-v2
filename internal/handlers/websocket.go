@@ -92,6 +92,12 @@ func ListenOnWsChan() {
 			response.ConnectedUsers = users()
 			broadcast(response)
 
+		case "send_message":
+			response.Action = "receive_message"
+			response.Message = p.Message
+			response.MessageType = p.Username
+			broadcast(response)
+
 		default:
 			response.Action = "unsupported"
 			p.Conn.WriteJSON(response)
